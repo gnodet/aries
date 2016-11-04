@@ -39,11 +39,11 @@ public class TestBlueprintContainer extends BlueprintContainerImpl {
 
     private ComponentDefinitionRegistryImpl registry;
     
-    public TestBlueprintContainer(ComponentDefinitionRegistryImpl registry) throws Exception {
+    public TestBlueprintContainer(ComponentDefinitionRegistryImpl registry) {
         this(registry, new JdkProxyManager());
     }
 
-    public TestBlueprintContainer(ComponentDefinitionRegistryImpl registry, ProxyManager proxyManager) throws Exception {
+    public TestBlueprintContainer(ComponentDefinitionRegistryImpl registry, ProxyManager proxyManager) {
         super(null, new TestBundleContext(), null, null, null, null, null, null, proxyManager, null);
         this.registry = registry;
         if (registry != null) {
@@ -55,7 +55,7 @@ public class TestBlueprintContainer extends BlueprintContainerImpl {
         }
     }
     
-    protected void processTypeConverters() throws Exception {
+    protected void processTypeConverters() {
         List<String> typeConverters = new ArrayList<String>();
         for (Target target : registry.getTypeConverters()) {
             if (target instanceof ComponentMetadata) {
