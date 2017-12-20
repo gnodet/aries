@@ -59,7 +59,7 @@ public class TestBundleContext implements BundleContext {
     }
 
     public Bundle getBundle() {
-        return null;
+        return new TestBundle();
     }
 
     public Bundle getBundle(long arg0) {

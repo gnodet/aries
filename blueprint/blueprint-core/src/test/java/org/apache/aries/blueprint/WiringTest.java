@@ -18,6 +18,7 @@
  */
 package org.apache.aries.blueprint;
 
+import java.lang.ref.Reference;
 import java.lang.reflect.Constructor;
 import java.math.BigInteger;
 import java.net.URI;
@@ -25,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Dictionary;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,6 +35,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.concurrent.atomic.AtomicReference;
 
 import junit.framework.Assert;
 
@@ -50,6 +53,7 @@ import org.apache.aries.blueprint.parser.ComponentDefinitionRegistryImpl;
 import org.apache.aries.blueprint.pojos.AmbiguousPojo;
 import org.apache.aries.blueprint.pojos.BeanD;
 import org.apache.aries.blueprint.pojos.BeanF;
+import org.apache.aries.blueprint.pojos.DmInterface;
 import org.apache.aries.blueprint.pojos.FITestBean;
 import org.apache.aries.blueprint.pojos.Multiple;
 import org.apache.aries.blueprint.pojos.PojoA;
@@ -63,6 +67,8 @@ import org.apache.aries.blueprint.pojos.PojoListener;
 import org.apache.aries.blueprint.pojos.PojoRecursive;
 import org.apache.aries.blueprint.pojos.Primavera;
 import org.apache.aries.blueprint.proxy.ProxyUtils;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceFactory;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.blueprint.container.ComponentDefinitionException;
 
@@ -540,6 +546,27 @@ public class WiringTest extends AbstractBlueprintTest {
         
         repository = createBlueprintContainer().getRepository();        
         assertNotNull(repository.create("c3"));
+    }
+
+    public void testDefaultMethods() throws Exception {
+        AtomicReference<Object> reference = new AtomicReference<>();
+
+        ComponentDefinitionRegistryImpl registry = parse("/test-circular.xml");
+        TestBlueprintContainer container = new TestBlueprintContainer(registry) {
+            @Override
+            public ServiceRegistration registerService(String[] classes, Object service, Dictionary properties) {
+                reference.set(service);
+                return super.registerService(classes, service, properties);
+            }
+        };
+
+        BlueprintRepository repository = container.getRepository();
+        ServiceRecipe recipe = (ServiceRecipe) repository.getRecipe("defaultMethods");
+        recipe.register();
+
+        Object factory = reference.get();
+        Object service = ((ServiceFactory) factory).getService(null, null);
+        ((DmInterface) service).newCache(null);
     }
     
     private TestBlueprintContainer createBlueprintContainer() throws Exception {

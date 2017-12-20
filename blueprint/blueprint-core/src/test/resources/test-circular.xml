@@ -95,5 +95,11 @@
     <bean id="c3" class="org.apache.aries.blueprint.pojos.PojoCircular">
         <property name="circular" ref="c1"/>
     </bean>
-    
+
+    <!-- for default methods -->
+    <service id="defaultMethods" interface="org.apache.aries.blueprint.pojos.DmInterface"
+             ref="defaultMethodsImpl"/>
+    <bean id="defaultMethodsImpl" class="org.apache.aries.blueprint.pojos.DmInterfaceImpl" />
+
+
 </blueprint>
